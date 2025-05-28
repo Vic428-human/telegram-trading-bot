@@ -2,11 +2,49 @@
 
 database setup for mongodb atlas and schema
 
+- [src/db/models/swap.js => It's going to have every swap with our swaps morails api ](https://docs.moralis.com/web3-data-api/evm/reference/get-swaps-by-wallet-address?address=0xcB1C1FdE09f811B294172696404e88E658659905&chain=eth&order=DESC)
 - src/db/models/trackedWallet.js => 追蹤特定錢包地址的交易活動 / 提供易於管理與分類的錢包清單 / 根據錢包狀態自動執行檢查或通知
 - src/db/models/chains.js => Chain Schema：用來儲存區塊鏈設定、區塊鏈瀏覽器網址，以及原生代幣資訊
 - src/db/index.js => 這個檔案會作為資料庫相關功能的進入點
 - src/polling => 指應用程式定期向區塊鏈節點或 API 發送請求，以獲取最新的鏈上資料或狀態更新。例如，開發者會透過 polling 方式，定時查詢某個錢包地址的餘額、交易狀態、NFT 持有情況等資訊
 - src/wallet => 初始化 EVM 或 Solana 錢包，例如使用 ethers.js 或 solana web3.js
+
+2. 主要目標
+
+- 唯一且完整地記錄每一筆 Swap 交易
+- 支援多鏈、多幣種的兌換資訊
+- 方便後續查詢、報表與數據分析
+- 支援交易處理狀態追蹤與異常監控
+
+## Swap 資料結構
+
+| 欄位名稱                   | 型別    | 必填 | 說明                                                       |
+| -------------------------- | ------- | ---- | ---------------------------------------------------------- |
+| `sourceWallet`             | String  | ✔️   | 來源錢包地址（用戶發起 Swap 的地址）                       |
+| `sourceChain`              | String  | ✔️   | 來源鏈名稱（如 Ethereum、BSC 等）                          |
+| `sourceTxHash`             | String  | ✔️   | 來源鏈上的交易雜湊，唯一標識一筆 Swap                      |
+| `sourceTimestamp`          | Date    | ✔️   | 來源鏈交易發生的時間                                       |
+| `tokenIn.address`          | String  | ✔️   | 兌換前代幣的合約地址                                       |
+| `tokenIn.symbol`           | String  | ✔️   | 兌換前代幣的符號                                           |
+| `tokenIn.name`             | String  | ✔️   | 兌換前代幣的名稱                                           |
+| `tokenIn.amount`           | String  | ✔️   | 兌換前代幣的數量（字串型態，避免精度誤差）                 |
+| `tokenIn.decimals`         | Number  | ✔️   | 兌換前代幣的小數位數                                       |
+| `tokenOut.address`         | String  | ✔️   | 兌換後代幣的合約地址                                       |
+| `tokenOut.symbol`          | String  | ✔️   | 兌換後代幣的符號                                           |
+| `tokenOut.name`            | String  | ✔️   | 兌換後代幣的名稱                                           |
+| `tokenOut.amount`          | String  | ✔️   | 兌換後代幣的數量（字串型態，避免精度誤差）                 |
+| `tokenOut.decimals`        | Number  | ✔️   | 兌換後代幣的小數位數                                       |
+| `usdValue`                 | Number  | ✔️   | 本次 Swap 的美元價值（用於報表與統計）                     |
+| `exchangeInfo.name`        | String  |      | 交易所或流動性池名稱（如 Uniswap V3）                      |
+| `exchangeInfo.address`     | String  |      | 交易所合約地址                                             |
+| `exchangeInfo.pairAddress` | String  |      | 交易對合約地址                                             |
+| `processed`                | Boolean |      | 是否已處理（預設 false）                                   |
+| `processingTimestamp`      | Date    |      | 系統處理該筆 Swap 的時間                                   |
+| `ourTxHash`                | String  |      | 系統執行 Swap 時產生的交易雜湊                             |
+| `status.code`              | String  |      | 處理狀態（pending, completed, failed, skipped, submitted） |
+| `status.message`           | String  |      | 狀態說明訊息                                               |
+| `createdAt`                | Date    |      | 建立時間（自動產生）                                       |
+| `updatedAt`                | Date    |      | 最後更新時間（自動產生）                                   |
 
 ### 資源參考
 
