@@ -16,10 +16,9 @@ database setup for mongodb atlas and schema
 - 方便後續查詢、報表與數據分析
 - 支援交易處理狀態追蹤與異常監控
 
-```mermaid
 graph TD
-    A[開始] --> B[用戶發起 Swap 交易]
-    B --> C[系統監聽到交易事件]
+A[開始] --> B[用戶發起 Swap 交易]
+B --> C[系統監聽到交易事件]
 
     C --> D[取得 sourceWallet, sourceChain,<br>sourceTxHash, sourceTimestamp]
 
@@ -51,7 +50,6 @@ graph TD
     style A fill:#f9f,stroke:#333
     style W fill:#bbf,stroke:#333
     style G fill:#fbb,stroke:#333
-```
 
 流程說明
 用戶發起 Swap 交易
