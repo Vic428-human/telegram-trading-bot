@@ -16,60 +16,6 @@ database setup for mongodb atlas and schema
 - 方便後續查詢、報表與數據分析
 - 支援交易處理狀態追蹤與異常監控
 
-開始
-│
-▼
-用戶發起 Swap 交易
-│
-▼
-系統監聽到交易事件
-│
-├── 取得來源錢包地址 (sourceWallet)
-├── 取得來源鏈名稱 (sourceChain)
-├── 取得交易雜湊 (sourceTxHash)
-├── 取得交易時間 (sourceTimestamp)
-│
-▼
-檢查資料唯一性
-│
-└── 是否已有相同 sourceWallet + sourceChain + sourceTxHash？
-├── 是 → 結束（避免重複處理）
-└── 否 → 新增記錄，狀態設為 pending
-│
-▼
-解析 Swap 內容
-│
-├── 記錄 tokenIn 資訊：
-│ - address, symbol, name, amount, decimals
-│
-├── 記錄 tokenOut 資訊：
-│ - address, symbol, name, amount, decimals
-│
-├── 計算 usdValue（美元價值）
-│
-▼
-（可選）記錄交易所資訊
-│
-└── 若有 exchangeInfo： - name, address, pairAddress
-│
-▼
-更新處理狀態與相關欄位
-│
-├── processed = true
-├── processingTimestamp = now
-├── ourTxHash = 系統產生的交易 Hash（若適用）
-├── status.code = completed / failed / submitted / skipped
-├── status.message = 錯誤說明或處理訊息
-│
-▼
-儲存資料並建立索引
-│
-├── 建立唯一索引：sourceWallet + sourceChain + sourceTxHash
-├── 建立查詢優化索引：processed, status.code, sourceTimestamp
-│
-▼
-結束
-
 流程說明
 用戶發起 Swap 交易
 系統收到用戶在特定鏈上的 Swap 交易，取得來源錢包、來源鏈、來源交易雜湊、交易時間等資訊。
@@ -199,6 +145,10 @@ v6: 12345678901234567890n（直接用 JS 的 BigInt）
 
 ```
 
-```
-
+```mermaid
+graph TD
+  Start[開始] --> Input[輸入資料]
+  Input --> Process[數據處理]
+  Process --> Output[輸出結果]
+  Output --> End[結束]
 ```
