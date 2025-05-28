@@ -16,6 +16,66 @@ database setup for mongodb atlas and schema
 - 方便後續查詢、報表與數據分析
 - 支援交易處理狀態追蹤與異常監控
 
+```mermaid
+graph TD
+    A[開始] --> B[用戶發起 Swap 交易]
+    B --> C[系統監聽到交易事件]
+
+    C --> D[取得 sourceWallet, sourceChain,<br>sourceTxHash, sourceTimestamp]
+
+    D --> E[檢查資料唯一性]
+    E --> F{是否有重複?<br>(sourceWallet + sourceChain + sourceTxHash)}
+    F -- 是 --> G[結束<br>(避免重複處理)]
+    F -- 否 --> H[新增記錄，狀態設為 pending]
+
+    H --> I[解析 Swap 內容]
+    I --> J[記錄 tokenIn 資訊<br>(address, symbol, name, amount, decimals)]
+    I --> K[記錄 tokenOut 資訊<br>(address, symbol, name, amount, decimals)]
+    I --> L[計算 usdValue]
+
+    L --> M[(可選) 記錄交易所資訊<br>exchangeInfo.name, address, pairAddress]
+
+    M --> N[更新處理狀態與相關欄位]
+    N --> O[processed = true]
+    N --> P[processingTimestamp = now]
+    N --> Q[ourTxHash = 系統產生的 Hash]
+    N --> R[status.code = completed / failed / ...]
+    N --> S[status.message = 錯誤或處理訊息]
+
+    R --> T[儲存資料並建立索引]
+    T --> U[建立唯一索引:<br>sourceWallet + sourceChain + sourceTxHash]
+    T --> V[建立查詢優化索引:<br>processed, status.code, sourceTimestamp]
+
+    V --> W[結束]
+
+    style A fill:#f9f,stroke:#333
+    style W fill:#bbf,stroke:#333
+    style G fill:#fbb,stroke:#333
+
+流程說明
+用戶發起 Swap 交易
+系統收到用戶在特定鏈上的 Swap 交易，取得來源錢包、來源鏈、來源交易雜湊、交易時間等資訊。
+
+記錄 Swap 詳細內容
+系統根據 Swap 內容，記錄兌換前後的代幣資訊（合約地址、名稱、符號、數量、小數位數），並計算美元價值。
+
+記錄交易所資訊
+若有對應的交易所或流動性池，記錄其名稱、合約地址與交易對地址。
+
+處理狀態管理
+
+初始狀態為 pending
+
+當系統處理完畢，更新 processed、processingTimestamp、ourTxHash 與 status
+
+若處理失敗，status.code 設為 failed，並填寫 message
+
+資料唯一性與查詢優化
+
+以 sourceWallet、sourceChain、sourceTxHash 組合為唯一索引，避免重複
+
+針對 processed、status.code、sourceTimestamp 建立索引，提升查詢效能
+
 ## Swap 資料結構
 
 | 欄位名稱                   | 型別    | 必填 | 說明                                                       |
@@ -96,21 +156,29 @@ database setup for mongodb atlas and schema
 ##### ethers.js v5 與 v6 主要差異比較實際代碼範例
 
 ```
+
 // v5 寫法：
 import { ethers } from 'ethers';
 const provider = new ethers.providers.JsonRpcProvider(url);
 const contract = new ethers.Contract(address, abi, provider);
+
 ```
 
 ```
+
 // v6 寫法：
 import { ethers } from 'ethers';
 const provider = new ethers.JsonRpcProvider(url);
 const contract = new ethers.Contract(address, abi, provider);
+
 ```
 
 ```
+
 BigNumber 與 BigInt 差異：
 v5: ethers.BigNumber.from('1000000000000000000')
 v6: 12345678901234567890n（直接用 JS 的 BigInt）
+
+```
+
 ```
