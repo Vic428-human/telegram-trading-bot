@@ -12,6 +12,7 @@
   "dependencies": {
     "@solana/web3.js": "^1.98.2",
     "axios": "^1.9.0",
-    "base-58": "^0.0.1"
+    "base-58": "^0.0.1",
+    "mongodb": "^6.16.0"
   }
 }
