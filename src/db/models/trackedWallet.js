@@ -1,4 +1,3 @@
-// src/db/models/trackedWallets.js
 const mongoose = require("mongoose");
 
 const trackedWalletSchema = new mongoose.Schema(
