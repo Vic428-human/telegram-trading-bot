@@ -14,7 +14,7 @@ const ChainSchema = new mongoose.Schema({
   // 鏈型別
   type: {
     type: String,
-    enum: ["evm", "solana"],
+    enum: ["evm", "solana"], // 兩種不同的區塊鏈智能合約執行環境，各自有獨特的架構、設計理念與應用生態
     required: true,
   },
   // 要用哪個去中心化交易所（DEX）
