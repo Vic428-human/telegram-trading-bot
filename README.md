@@ -51,6 +51,7 @@ graph TD
     style A fill:#f9f,stroke:#333
     style W fill:#bbf,stroke:#333
     style G fill:#fbb,stroke:#333
+```
 
 流程說明
 用戶發起 Swap 交易
@@ -178,6 +179,8 @@ const contract = new ethers.Contract(address, abi, provider);
 BigNumber 與 BigInt 差異：
 v5: ethers.BigNumber.from('1000000000000000000')
 v6: 12345678901234567890n（直接用 JS 的 BigInt）
+
+```
 
 ```
 
