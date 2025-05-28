@@ -146,9 +146,20 @@ v6: 12345678901234567890n（直接用 JS 的 BigInt）
 ```
 
 ```mermaid
-graph TD
-  Start[開始] --> Input[輸入資料]
-  Input --> Process[數據處理]
-  Process --> Output[輸出結果]
-  Output --> End[結束]
+flowchart TD
+    A["監聽區塊鏈事件"] --> B["解析 Swap 交易"]
+    B --> C["創建 Swap 記錄"]
+    C --> D["設置初始狀態: pending"]
+    D --> E["計算 USD 價值"]
+    E --> F["保存到數據庫"]
+    F --> G["處理隊列"]
+    G --> H{"處理成功?"}
+    H -->|是| I["更新狀態: completed"]
+    H -->|否| J["更新狀態: failed"]
+    I --> K["記錄處理時間戳"]
+    J --> L["記錄錯誤訊息"]
+    K --> M["完成"]
+    L --> N{"需要重試?"}
+    N -->|是| G
+    N -->|否| M
 ```
