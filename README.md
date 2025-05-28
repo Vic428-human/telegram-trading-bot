@@ -24,16 +24,16 @@ graph TD
     C --> D[取得 sourceWallet, sourceChain,<br>sourceTxHash, sourceTimestamp]
 
     D --> E[檢查資料唯一性]
-    E --> F{是否有重複?<br>(sourceWallet + sourceChain + sourceTxHash)}
+    E --> F[是否有重複?\n(sourceWallet + sourceChain + sourceTxHash)]
     F -- 是 --> G[結束<br>(避免重複處理)]
     F -- 否 --> H[新增記錄，狀態設為 pending]
 
     H --> I[解析 Swap 內容]
-    I --> J[記錄 tokenIn 資訊<br>(address, symbol, name, amount, decimals)]
-    I --> K[記錄 tokenOut 資訊<br>(address, symbol, name, amount, decimals)]
+    I --> J[記錄 tokenIn 資訊\n(address, symbol, name, amount, decimals)]
+    I --> K[記錄 tokenOut 資訊\n(address, symbol, name, amount, decimals)]
     I --> L[計算 usdValue]
 
-    L --> M[(可選) 記錄交易所資訊<br>exchangeInfo.name, address, pairAddress]
+    L --> M[(可選) 記錄交易所資訊\nexchangeInfo.name, address, pairAddress]
 
     M --> N[更新處理狀態與相關欄位]
     N --> O[processed = true]
@@ -43,8 +43,8 @@ graph TD
     N --> S[status.message = 錯誤或處理訊息]
 
     R --> T[儲存資料並建立索引]
-    T --> U[建立唯一索引:<br>sourceWallet + sourceChain + sourceTxHash]
-    T --> V[建立查詢優化索引:<br>processed, status.code, sourceTimestamp]
+    T --> U[建立唯一索引:\nsourceWallet + sourceChain + sourceTxHash]
+    T --> V[建立查詢優化索引:\nprocessed, status.code, sourceTimestamp]
 
     V --> W[結束]
 
