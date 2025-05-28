@@ -16,40 +16,59 @@ database setup for mongodb atlas and schema
 - 方便後續查詢、報表與數據分析
 - 支援交易處理狀態追蹤與異常監控
 
-graph TD
-A[開始] --> B[用戶發起 Swap 交易]
-B --> C[系統監聽到交易事件]
-
-    C --> D[取得 sourceWallet, sourceChain,<br>sourceTxHash, sourceTimestamp]
-
-    D --> E[檢查資料唯一性]
-    E --> F[是否有重複?\n(sourceWallet + sourceChain + sourceTxHash)]
-    F -- 是 --> G[結束<br>(避免重複處理)]
-    F -- 否 --> H[新增記錄，狀態設為 pending]
-
-    H --> I[解析 Swap 內容]
-    I --> J[記錄 tokenIn 資訊\n(address, symbol, name, amount, decimals)]
-    I --> K[記錄 tokenOut 資訊\n(address, symbol, name, amount, decimals)]
-    I --> L[計算 usdValue]
-
-    L --> M[(可選) 記錄交易所資訊\nexchangeInfo.name, address, pairAddress]
-
-    M --> N[更新處理狀態與相關欄位]
-    N --> O[processed = true]
-    N --> P[processingTimestamp = now]
-    N --> Q[ourTxHash = 系統產生的 Hash]
-    N --> R[status.code = completed / failed / ...]
-    N --> S[status.message = 錯誤或處理訊息]
-
-    R --> T[儲存資料並建立索引]
-    T --> U[建立唯一索引:\nsourceWallet + sourceChain + sourceTxHash]
-    T --> V[建立查詢優化索引:\nprocessed, status.code, sourceTimestamp]
-
-    V --> W[結束]
-
-    style A fill:#f9f,stroke:#333
-    style W fill:#bbf,stroke:#333
-    style G fill:#fbb,stroke:#333
+開始
+│
+▼
+用戶發起 Swap 交易
+│
+▼
+系統監聽到交易事件
+│
+├── 取得來源錢包地址 (sourceWallet)
+├── 取得來源鏈名稱 (sourceChain)
+├── 取得交易雜湊 (sourceTxHash)
+├── 取得交易時間 (sourceTimestamp)
+│
+▼
+檢查資料唯一性
+│
+└── 是否已有相同 sourceWallet + sourceChain + sourceTxHash？
+├── 是 → 結束（避免重複處理）
+└── 否 → 新增記錄，狀態設為 pending
+│
+▼
+解析 Swap 內容
+│
+├── 記錄 tokenIn 資訊：
+│ - address, symbol, name, amount, decimals
+│
+├── 記錄 tokenOut 資訊：
+│ - address, symbol, name, amount, decimals
+│
+├── 計算 usdValue（美元價值）
+│
+▼
+（可選）記錄交易所資訊
+│
+└── 若有 exchangeInfo： - name, address, pairAddress
+│
+▼
+更新處理狀態與相關欄位
+│
+├── processed = true
+├── processingTimestamp = now
+├── ourTxHash = 系統產生的交易 Hash（若適用）
+├── status.code = completed / failed / submitted / skipped
+├── status.message = 錯誤說明或處理訊息
+│
+▼
+儲存資料並建立索引
+│
+├── 建立唯一索引：sourceWallet + sourceChain + sourceTxHash
+├── 建立查詢優化索引：processed, status.code, sourceTimestamp
+│
+▼
+結束
 
 流程說明
 用戶發起 Swap 交易
