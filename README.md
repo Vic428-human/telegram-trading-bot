@@ -14,16 +14,47 @@
 
 - [Jupiter Ultra API 的用途是讓開發者在 Solana 上聚合多個流動性來源，實現用戶代幣閃兌、查詢最佳價格、獲取賬戶餘額、估算滑點、保護用戶免於 MEV 攻擊，並簡化交易簽名與執行流程，無需自己處理 RPC、手續費或交易廣播等底層細節。](https://dev.jup.ag/docs/ultra-api/)
 
-## 使用到的套件與版本
+#### 專案用到的套件與版本
 
-| 套件名稱              | 版本    | 說明                                                                                               |
-| --------------------- | ------- | -------------------------------------------------------------------------------------------------- |
-| @solana/web3.js       | ^1.98.2 | 2025/05/28 版本一                                                                                  |
-| axios                 | ^1.9.0  | 2025/05/28 版本一致                                                                                |
-| base-58               | ^0.0.1  | 11 年未更新，功能單純，僅適用於非常基本需求，bs58 > 6.0.0 穩定、主流，廣泛用於加密貨幣與區塊鏈專案 |
-| dotenv                | ^16.5.0 |                                                                                                    |
-| ethers                | 5.0.0   |                                                                                                    |
-| mongodb               | ^6.3.0  |                                                                                                    |
-| mongoose              | ^8.0.3  |                                                                                                    |
-| node-telegram-bot-api | ^0.65.1 |                                                                                                    |
-| nodemon               | ^3.0.2  |                                                                                                    |
+| 套件名稱              | 版本    | 說明                                                                                                              |
+| --------------------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| @solana/web3.js       | ^1.98.2 | 2025/05/28 版本一致                                                                                               |
+| axios                 | ^1.9.0  | 2025/05/28 版本一致                                                                                               |
+| base-58               | ^0.0.1  | 11 年未更新，功能單純，僅適用於非常基本需求，之後應該會改成 bs58 > 6.0.0 穩定、主流，廣泛用於加密貨幣與區塊鏈專案 |
+| dotenv                | ^16.5.0 | 2025/05/28 版本一致                                                                                               |
+| ethers                | 5.0.0   | 先不升級，跟 v6 寫法上有區別                                                                                      |
+| mongodb               | ^6.3.0  |                                                                                                                   |
+| mongoose              | ^8.0.3  |                                                                                                                   |
+| node-telegram-bot-api | ^0.65.1 |                                                                                                                   |
+| nodemon               | ^3.0.2  |                                                                                                                   |
+
+#### ethers.js v5 與 v6 主要差異比較
+
+| 特性/寫法           | ethers v5                          | ethers v6                                 |
+| ------------------- | ---------------------------------- | ----------------------------------------- |
+| 數字處理            | 使用自有 BigNumber 類              | 改用原生 ES2020 BigInt                    |
+| Provider 實例       | `ethers.providers.JsonRpcProvider` | `ethers.JsonRpcProvider`                  |
+| Web3Provider 命名   | `Web3Provider`                     | 改名為 `BrowserProvider`                  |
+| 合約方法調用        | 需處理方法簽名衝突                 | 用 Proxy 動態解析，Typed API 更簡潔       |
+| 方法定義            | 方法分在 buckets                   | 每個方法直接掛載 less-common 操作         |
+| 導入方式            | 多子包、monorepo                   | 所有 API 集中在主包，pkg.exports 支援細分 |
+| 交易手續費          | 多個 fee 參數                      | 統一為 `.getFeeData()`                    |
+| Transaction helpers | 分散多處                           | 集中於 `Transaction` 類                   |
+
+##### ethers.js v5 與 v6 主要差異比較實際代碼範例
+
+```
+// v5 寫法：
+import { ethers } from 'ethers';
+const provider = new ethers.providers.JsonRpcProvider(url);
+const contract = new ethers.Contract(address, abi, provider);
+
+```
+
+```
+// v6 寫法：
+import { ethers } from 'ethers';
+const provider = new ethers.JsonRpcProvider(url);
+const contract = new ethers.Contract(address, abi, provider);
+
+```
