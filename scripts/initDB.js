@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Chain = require("../src/db/models/chains");
+const BotConfig = require("../src/db/models/botConfig");
 require("dotenv").config();
 
 const initDatabase = async () => {
@@ -7,19 +8,70 @@ const initDatabase = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log("MongoDB 已連線");
 
-    // 初始化 鏈 的資料庫
+    // // 初始化 鏈 的資料庫
     await initChains();
+    // // 初始化 機器人 配置
+    await initBotConfig(); 
 
+    // 一旦exit(0)調用，控制權將不會返回到調用該函數的地方，也不會執行該函數之後的任何程式碼，
+    // 包括相同執行緒中的其他函數或任何尚未執行的清理工作
+    process.exit(0); // 一般來說代表執行正確
    
   } catch (error) {
     console.error("Error initializing database:", error);
-    process.exit(1);
+    process.exit(1); // 一般來說代表執行錯誤
   }
 };
 
 
+// 後續升級或維護考量
+// 有可能之後會新增新的「必要設定」。
+// 若直接用 defaultConfig 覆蓋，可能會影響已經存在的設定（例如用戶自訂的值被覆蓋）。
+// 使用 requiredSettings 只會補齊缺少的設定
+// 安全性：不會覆蓋用戶已經設定好的值。
+// 擴展性：未來新增設定時，只要加到 requiredSettings，升級時自動補齊。
+// 效率：初次啟動一次插入，之後只補缺。
 const initBotConfig = async() => {
-   Chain.countDocuments()
+  const configCount = await Chain.countDocuments()
+
+  if(configCount > 0) {
+    console.log("機器人配置已初始化...")
+    
+     // 用途：當資料庫完全沒有任何設定時（也就是第一次啟動或資料被清空時），一次性建立所有預設設定。
+    const defaultConfig = [
+      {setting: "botStatus",value: "running", description:"機器人狀態"},
+      {setting: "notifyOnfailed",value: true, description:"通知Swap失敗"},
+    ]
+
+    for (const config of defaultConfig){
+      // 確認 default 是否存在
+      // .exec() 會強制執行查詢並返回一個原生 Promise，這在需要與 async/await 或其他 Promise-based 函式庫整合時特別有用
+      // exec()用法 =>  https://stackoverflow.com/questions/73093294/how-to-save-a-query-from-model-findone-on-a-variable-using-mongoose
+      // 如果只是簡單 await 查詢，且不在意 Promise 純度或堆疊追蹤，也可以不加 .exec()，Mongoose 會自動執行查詢並返回結果。
+      const exists = await BotConfig.findOne({setting: config.setting}) // 不加 .exec() 時，Mongoose 查詢物件本身也有 .then() 方法，能直接用於 async/await，但它返回的是一個「類 Promise」的 Mongoose 查詢對象，而不是標準的原生 Promise
+      
+      if(!exists){
+        await BotConfig.create(config);
+        console.log(`添加缺少的機器人配置,${config.setting}`);
+      }
+    }
+    return;
+  }
+
+  console.log("已初始化預設的機器人配置...")
+
+    // 用途：當資料庫已經有一些設定，但不確定是否有所有「必要設定」時，檢查並補齊缺少的設定。
+    const requireConfig = [
+      {setting: "botStatus",value: "running", description:"機器人狀態"},
+      {setting: "notifyOnfailed",value: true, description:"通知Swap失敗"},
+      // 當環境變數有另外設定時，假設我希望通知發給特定使用者(chat ID)，就會需要彈性配置
+      ...(process.env.ADMIN_CHAT_ID ? [{setting: "chatId",value: process.env.ADMIN_CHAT_ID, description:"管理員Chat ID"}] : []),
+    ]
+
+    // 把實際上必要的欄位都存在DB
+    await BotConfig.insertMany(requireConfig);
+    console.log("已初始化必要的機器人配置...")
+    
 }
 
 const initChains = async () => {
@@ -114,7 +166,7 @@ const initChains = async () => {
     // 如果未來有不同版本的舊網址就依序在此處新增即可。 參 chais.js 裡的 blockExplorer 回顧上方註解
     chain.explorerUrl = chain.blockExplorer;
     // 根據不同的區塊鏈環境去設定 1.某個特定 錢包地址的網址 或是 2.某個 特定交易的網址
-    if(type === "solana"){
+    if(chain.type === "solana"){
       chain.explorerTxUrl = `${chain.blockExplorer}/tx/{hash}`
       chain.explorerAddressUrl = `${chain.blockExplorer}/address/{address}`
     }else{
@@ -122,13 +174,14 @@ const initChains = async () => {
       chain.explorerAddressUrl = `${chain.blockExplorer}/address/{address}`
     }
   })
-  Chain.insertMany(defaultChains)
-  console.log(`Chain collection ${Chain.length} documents added`);
+  await Chain.insertMany(defaultChains);
+  console.log(`Inserted ${defaultChains.length} default chains`);
+
 };
 
 initDatabase();
 
-
+// 其他筆記
 // insertMany 和 create 在 Mongoose 中都可以用來新增文件（documents）到集合
 // （collection）中 ，但它們在使用方式和底層行為上有一些差異。以下是詳細比較：
 
@@ -170,3 +223,4 @@ initDatabase();
 //   },
 //   ...
 // ]
+
