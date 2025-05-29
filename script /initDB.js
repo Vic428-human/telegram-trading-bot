@@ -39,7 +39,7 @@ const initChains = async () => {
       name: "Ethereum", // 區塊鏈網路
       type: "evm", // 代表是 EVM 相容鏈，都有自己的 chainId，例如以太坊主網是 1，Polygon 是 137，這個值用來區分『不同的網路』，防止交易或資產跨鏈混淆
       rpcUrl: process.env.ETH_RPC_URL || "https://ethereum.publicnode.com",
-      blockExplorer: "https://etherscan.io",
+      blockExplorer: "https://etherscan.io", // 區塊瀏覽器
       swapAggregator: "1inch",
       isActive: true,
       nativeToken: {
@@ -102,6 +102,23 @@ const initChains = async () => {
     },
   ];
 
+  // 如果需要處理每一個元素但不需要結果陣列 → 用 forEach ， 不會用到 return 
+  // 如果需要把原陣列轉換成另一種形式的陣列 → 用 map ，會用到 return 
+  // Etherscan 上某一筆交易的 hash 範本 => https://etherscan.io/tx/0x2fdefc8de9b3eb113a5741111d0b1b90f90a0c7d3c5e0b153b25c27f550ba7a3
+  defaultChains.forEach((chain)=>{
+    // 如果未來有不同版本的舊網址就依序在此處新增即可。 參 chais.js 裡的 blockExplorer 回顧上方註解
+    chain.explorerUrl = chain.blockExplorer;
+    // 根據不同的區塊鏈環境去設定 1.某個特定 錢包地址的網址 或是 2.某個 特定交易的網址
+    if(type === "solana"){
+      chain.explorerTxUrl = `${chain.blockExplorer}/tx/{hash}`
+      chain.explorerAddressUrl = `${chain.blockExplorer}/address/{address}`
+    }else{
+      chain.explorerTxUrl = `${chain.blockExplorer}/tx/{hash}`
+      chain.explorerAddressUrl = `${chain.blockExplorer}/address/{address}`
+    }
+  })
+  Chain.insertMany(defaultChains)
+  console.log(`Chain collection ${chain.length} documents added`);
 };
 
 initDatabase();
