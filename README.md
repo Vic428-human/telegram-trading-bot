@@ -5,23 +5,17 @@
 > 且 node 18.20.4 版本下載相關套件，雖然 node 14 以上就能用 ES2020+ 的寫法，但此專案還是以 ES2017+方式撰寫。當然日後用 ES2020+ 新特性去實作也不影響就是了。
 
 - src/script => populate our database with all the basic config
-- src/db/models/trackedWallet.js => 追蹤特定錢包地址的交易活動 / 提供易於管理與分類的錢包清單 / 根據錢包狀態自動執行檢查或通知
-- src/db/models/chains.js => Chain Schema：用來儲存區塊鏈設定、區塊鏈瀏覽器網址，以及原生代幣資訊
 - src/db/index.js => 這個檔案會作為資料庫相關功能的進入點
 - src/polling => 指應用程式定期向區塊鏈節點或 API 發送請求，以獲取最新的鏈上資料或狀態更新。例如，開發者會透過 polling 方式，定時查詢某個錢包地址的餘額、交易狀態、NFT 持有情況等資訊
 - src/wallet => 初始化 EVM 或 Solana 錢包，例如使用 ethers.js 或 solana web3.js
 
-## Swap 業務需求
-
-### 主要目標
+## 主要目標
 
 🤖 Telegram Swap Copy Trading Bot
 一個自動複製鏈上錢包交易行為的 Telegram 機器人，支援多鏈（EVM / Solana）與 DEX（1inch / Jupiter）
 
 ✅ 功能清單
 以下為目前專案的主要功能模組與待完成/已完成任務，可勾選進行進度追蹤。
-
-### 1. 🧑‍💻 使用者互動層（User Interface）
 
 ### 1. 🧑‍💻 使用者互動層（User Interface）
 
@@ -44,6 +38,7 @@
 
 ### 3. 📜 命令處理模組（Command Handlers）
 
+- [x] 規劃初始化 DB 的鏈資料，透過 npm 指令 方式 script /initDB.js
 - [ ] 解析 `/add_wallet` 等指令
 - [ ] 更新資料庫中用戶配置與錢包列表
 - [ ] 觸發對應流程（如新增錢包後啟動監控）
@@ -52,11 +47,11 @@
 
 ### 4. 🗃️ 資料庫模組（Database Models）
 
-- [ ] Chain Model：儲存支援的區塊鏈資訊
-- [ ] Tracked Wallet Model：記錄用戶追蹤的錢包地址與所屬鏈
-- [ ] Swap Model：儲存偵測到的交易與執行狀態
+- [x] Chain Model：儲存支援的區塊鏈資訊 src/db/models/chains.js
+- [x] Tracked Wallet Model：記錄用戶追蹤的錢包地址與所屬鏈 src/db/models/trackedWallet.js
+- [x] [Swap Model：儲存偵測到的交易與執行狀態 src/db/models/swap.js](https://docs.moralis.com/web3-data-api/evm/reference/get-swaps-by-wallet-address?address=0xcB1C1FdE09f811B294172696404e88E658659905&chain=eth&order=DESC)
 - [ ] Bot Config Model：保存用戶自訂設定
-- [ ] 支援多租戶架構（每位用戶獨立資料）
+- [x] DB 連線成功或失敗邏輯 src/db/index.js
 
 ---
 
