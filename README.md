@@ -141,8 +141,6 @@
 - [ ] 通知服務將執行結果回報給用戶
 - [ ] Cleanup Service 定期清除舊交易記錄
 
-- [src/db/models/swap.js => 整合 Swap 功能，並透過 Swaps Moralis API 實現](https://docs.moralis.com/web3-data-api/evm/reference/get-swaps-by-wallet-address?address=0xcB1C1FdE09f811B294172696404e88E658659905&chain=eth&order=DESC)
-
 ## 資源參考
 
 #### 官方技術文件與 API 參考手冊
