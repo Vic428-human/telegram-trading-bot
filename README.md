@@ -4,8 +4,6 @@
 > 箭頭函數與 async/await 語法、const 與解構賦值、模板字符串(process.env.ETH_RPC_URL || "")，未使用 ES2020+ 新特性如 optional chaining (?.) 或 nullish coalescing (??)，
 > 且 node 18.20.4 版本下載相關套件，雖然 node 14 以上就能用 ES2020+ 的寫法，但此專案還是以 ES2017+方式撰寫。當然日後用 ES2020+ 新特性去實作也不影響就是了。
 
-- src/script => populate our database with all the basic config
-- src/db/index.js => 這個檔案會作為資料庫相關功能的進入點
 - src/polling => 指應用程式定期向區塊鏈節點或 API 發送請求，以獲取最新的鏈上資料或狀態更新。例如，開發者會透過 polling 方式，定時查詢某個錢包地址的餘額、交易狀態、NFT 持有情況等資訊
 - src/wallet => 初始化 EVM 或 Solana 錢包，例如使用 ethers.js 或 solana web3.js
 
