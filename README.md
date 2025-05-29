@@ -21,13 +21,15 @@
 ✅ 功能清單
 以下為目前專案的主要功能模組與待完成/已完成任務，可勾選進行進度追蹤。
 
-1. 🧑‍💻 使用者互動層（User Interface）
-   支援 /start 啟動機器人
-   支援 /add_wallet 新增監控錢包
-   支援 /remove_wallet 刪除錢包
-   支援 /list_wallets 查看所有已追蹤錢包
-   支援 /config 設定複製策略（Gas、比例等）
-   支援 /help 顯示使用說明
+### 1. 🧑‍💻 使用者互動層（User Interface）
+
+- [ ] 支援 `/start` 啟動機器人
+- [ ] 支援 `/add_wallet` 新增監控錢包
+- [ ] 支援 `/remove_wallet` 刪除錢包
+- [ ] 支援 `/list_wallets` 查看所有已追蹤錢包
+- [ ] 支援 `/config` 設定複製策略（Gas、比例等）
+- [ ] 支援 `/help` 顯示使用說明
+
 2. 🤖 Telegram 機器人介面（Telegram Bot Interface）
    接收並解析用戶指令
    發送訊息回應用戶操作結果
