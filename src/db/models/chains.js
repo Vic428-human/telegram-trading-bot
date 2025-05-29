@@ -6,7 +6,7 @@ const ChainSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  // 鏈的名稱，例如 EVM 鏈或 Solana，決定要用哪個區塊鏈瀏覽器
+  // 鏈的名稱，例如 EVM 鏈 或 Solana，決定要用哪個區塊鏈瀏覽器
   name: {
     type: String,
     required: true,
@@ -27,12 +27,18 @@ const ChainSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // 區塊鏈瀏覽器的網址
+
+  // 假設原本舊版本的程式中是使用 chain.explorerUrl 這個屬性名稱，
+  // 後來改成了 chain.blockExplorer ，但為了讓舊的 code 還是可以跑，就加上這一行讓 explorerUrl 還是存在。
+  // 設想未來因為某些原因，欄位多出了一個叫做 newExplorerUrl 的欄位，用途也是作為區塊鏈瀏覽器的網址，
+  // 提供給前端人員調用，即使這位新的開發人員使用的是這個屬性，也不影響 前端 運行，也不會出現錯誤。
+  // 當 區塊鏈瀏覽器的網址 改變時，更新 https://etherscanOld.io(舊) 地址，仍然可以導向新地址 https://etherscanNew.io(新)
+  // https://etherscanNew.io(新)
   blockExplorer: {
     type: String,
     required: true,
   },
-  // 向下相容的選填欄位
+  // https://etherscanOld.io(舊)
   explorerUrl: {
     type: String,
     required: false,
