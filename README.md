@@ -48,7 +48,7 @@
 - [x] Chain Model：儲存支援的區塊鏈資訊 src/db/models/chains.js
 - [x] Tracked Wallet Model：記錄用戶追蹤的錢包地址與所屬鏈 src/db/models/trackedWallet.js
 - [x] [Swap Model：儲存偵測到的交易與執行狀態 src/db/models/swap.js](https://docs.moralis.com/web3-data-api/evm/reference/get-swaps-by-wallet-address?address=0xcB1C1FdE09f811B294172696404e88E658659905&chain=eth&order=DESC)
-- [ ] Bot Config Model：保存用戶自訂設定
+- [x] Bot Config Model：跟機器人有關的基本配置訊息，例如是否 bot 有正常運行：src/db/models/botConfig.js
 - [x] DB 連線成功或失敗邏輯 src/db/index.js
 
 ---
