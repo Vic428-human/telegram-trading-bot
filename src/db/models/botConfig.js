@@ -26,3 +26,11 @@ const botConfigSchema = new mongoose.Schema(
 const BotConfig = mongoose.model("BotConfig", botConfigSchema);
 
 module.exports = BotConfig;
+
+// [
+//     {
+//       setting: "chatId",
+//       value: 可以是數字，也能是字串, 不限定類型 // jasper01
+//       description: "讓機器人知道發生事情時要通知誰",
+//     },
+// ]   
