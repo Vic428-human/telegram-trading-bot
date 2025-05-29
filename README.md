@@ -15,31 +15,88 @@
 
 ### 主要目標
 
-- 唯一且完整地記錄每一筆 Swap 交易
-- 支援多鏈、多幣種的兌換資訊
-- 方便後續查詢、報表與數據分析
-- 支援交易處理狀態追蹤與異常監控
+🤖 Telegram Swap Copy Trading Bot
+一個自動複製鏈上錢包交易行為的 Telegram 機器人，支援多鏈（EVM / Solana）與 DEX（1inch / Jupiter）
+
+✅ 功能清單
+以下為目前專案的主要功能模組與待完成/已完成任務，可勾選進行進度追蹤。
+
+1. 🧑‍💻 使用者互動層（User Interface）
+   支援 /start 啟動機器人
+   支援 /add_wallet 新增監控錢包
+   支援 /remove_wallet 刪除錢包
+   支援 /list_wallets 查看所有已追蹤錢包
+   支援 /config 設定複製策略（Gas、比例等）
+   支援 /help 顯示使用說明
+2. 🤖 Telegram 機器人介面（Telegram Bot Interface）
+   接收並解析用戶指令
+   發送訊息回應用戶操作結果
+   整合命令處理與通知模組
+3. 📜 命令處理模組（Command Handlers）
+   解析 /add_wallet 等指令
+   更新資料庫中用戶配置與錢包列表
+   觸發對應流程（如新增錢包後啟動監控）
+4. 🗃️ 資料庫模組（Database Models）
+   Chain Model：儲存支援的區塊鏈資訊
+   Tracked Wallet Model：記錄用戶追蹤的錢包地址與所屬鏈
+   Swap Model：儲存偵測到的交易與執行狀態
+   Bot Config Model：保存用戶自訂設定
+   支援多租戶架構（每位用戶獨立資料）
+5. 🔁 定時輪詢服務（Polling Services）
+   a. Swap Fetcher
+   定期呼叫 Moralis API 或 RPC 取得錢包歷史 Swap
+   過濾新交易（避免重複執行）
+   儲存新交易至資料庫為「待處理」
+   b. Swap Processor
+   從資料庫取出「待處理」Swap
+   呼叫 Execution Service 複製交易
+   更新交易狀態（執行中 / 成功 / 失敗）
+   發送交易結果通知給用戶
+   c. Cleanup Service
+   定期清理過期 Swap 記錄（如超過 24 小時未執行）
+   確保資料庫效能穩定
+6. 🌐 外部 API 整合（External APIs）
+   整合 Moralis API 取得錢包交易
+   整合 Blockchain RPCs 提交交易至目標鏈
+   整合 1inch API 用於 EVM Swap
+   整合 Jupiter API 用於 Solana Swap
+7. 🔗 區塊鏈服務模組（Chain Services）
+   a. EVM Chain Service
+   支援 Ethereum、BSC、Polygon 等 EVM 鏈
+   處理 ERC-20、ERC-721 交易簽署與廣播
+   b. Solana Chain Service
+   支援 SPL Token 與 Jupiter 交易格式
+   處理交易簽署與提交至 Solana 鏈
+8. ⚡ 執行服務模組（Execution Services）
+   a. 1inch Swap
+   根據 1inch API 回傳資料複製 Swap
+   支援 Gas 價格優化與滑點容忍度調整
+   b. Jupiter Swap
+   使用 Jupiter SDK 建立 Solana Swap 交易
+   自動處理路由與交易打包
+   c. 錢包服務整合
+   私鑰加密管理
+   產生交易簽章
+   發送到對應鏈的 RPC 節點
+9. 🔔 通知模組（Notification Service）
+   支援成功/失敗通知
+   支援錯誤原因提示
+   支援用戶自訂通知偏好（例如僅接收失敗通知）
+   🔄 主要流程邏輯（業務流）
+   用戶新增錢包
+   使用 Telegram 發送 /add_wallet 指令
+   Bot 將錢包地址與鏈資訊存入資料庫
+   定期檢測交易
+   Swap Fetcher 定期呼叫 Moralis API 檢查錢包 Swap
+   發現新交易後存入資料庫為「待處理」
+   處理與複製交易
+   Swap Processor 取出待處理交易
+   呼叫 Execution Services 簽署並提交交易至鏈上
+   結果通知與清理
+   通知服務將執行結果回報給用戶
+   Cleanup Service 定期清除舊交易記錄
 
 - [src/db/models/swap.js => 整合 Swap 功能，並透過 Swaps Moralis API 實現](https://docs.moralis.com/web3-data-api/evm/reference/get-swaps-by-wallet-address?address=0xcB1C1FdE09f811B294172696404e88E658659905&chain=eth&order=DESC)
-
-```mermaid
-flowchart TD
-    A["監聽區塊鏈事件"] --> B["解析 Swap 交易"]
-    B --> C["創建 Swap 記錄"]
-    C --> D["設置初始狀態: pending"]
-    D --> E["計算 USD 價值"]
-    E --> F["保存到數據庫"]
-    F --> G["處理隊列"]
-    G --> H{"處理成功?"}
-    H -->|是| I["更新狀態: completed"]
-    H -->|否| J["更新狀態: failed"]
-    I --> K["記錄處理時間戳"]
-    J --> L["記錄錯誤訊息"]
-    K --> M["完成"]
-    L --> N{"需要重試?"}
-    N -->|是| G
-    N -->|否| M
-```
 
 ## 資源參考
 
