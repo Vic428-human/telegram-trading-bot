@@ -36,7 +36,9 @@
 
 ### 3. 📜 命令處理模組（Command Handlers）
 
-- [x] 規劃初始化 DB 的鏈資料，透過 npm 指令 方式 script /initDB.js
+- [x] 初始化不同鏈的資料給 DB scripts/initDB.js
+- [x] 初始化機器人配置給 DB scripts/initDB.js
+- [x] 用 requiredSettings 增量補齊必要設定，避免覆蓋掉機器人原先的初始配置，提升安全性與擴展性 scripts/initDB.js
 - [ ] 解析 `/add_wallet` 等指令
 - [ ] 更新資料庫中用戶配置與錢包列表
 - [ ] 觸發對應流程（如新增錢包後啟動監控）
