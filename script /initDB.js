@@ -17,6 +17,11 @@ const initDatabase = async () => {
   }
 };
 
+
+const initBotConfig = async() => {
+   Chain.countDocuments()
+}
+
 const initChains = async () => {
   // countDocuments() 函數用於統計資料庫集合中符合篩選器的文件數量 => 沒計算到 = 資料庫還不存在
   const chainCount = await Chain.countDocuments();
@@ -118,7 +123,50 @@ const initChains = async () => {
     }
   })
   Chain.insertMany(defaultChains)
-  console.log(`Chain collection ${chain.length} documents added`);
+  console.log(`Chain collection ${Chain.length} documents added`);
 };
 
 initDatabase();
+
+
+// insertMany 和 create 在 Mongoose 中都可以用來新增文件（documents）到集合
+// （collection）中 ，但它們在使用方式和底層行為上有一些差異。以下是詳細比較：
+
+// 小結：怎麼選？
+// 如果你需要：
+// 觸發 save 鉤子（hook）
+// 驗證 schema 驗證規則
+// 得到 document 實例（可用 methods）
+// → 請使用 create()
+// 使用 create() 的回傳值（Document 實例）：
+// [
+//   MongooseDocument {
+//     _id: ObjectId("..."),
+//     name: 'Alice',
+//     age: 25,
+//     __v: 0,
+//     isNew: false,
+//     save: [Function: save],
+//     validateSync: [Function: validateSync]
+//   },
+//   ...
+// ]
+
+
+// =================
+// 如果你需要：
+// 快速大量插入資料
+// 不需要驗證或 hook
+// 效能優先
+// → 請使用 insertMany()
+// User.insertMany([{ name: 'Alice' }]);
+// 使用 insertMany() 的回傳值（純 JS 物件）： BSON
+// [
+//   {
+//     _id: ObjectId("..."),
+//     name: 'Alice',
+//     age: 25,
+//     __v: 0
+//   },
+//   ...
+// ]
