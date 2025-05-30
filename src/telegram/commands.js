@@ -28,7 +28,7 @@ module.exports = { startCommand, addWalletCommand };
 // 參 E-1
 // chat.id 的來源說明 當使用者與Telegram 機器人（bot）互動時（例如發送 /start 指令），Telegram 伺服器會將一個訊息（message）物件傳送給你的 bot。這個物件通常包含如下結構：
 // TELEGRAM_BOT_TOKEN 取得方式 => http://blog.3dgowl.com/telegram-telegram%e4%ba%8c-%e5%bb%ba%e7%ab%8b-bot/
-// `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}:AAGi2Z9crbYhLIe7brIOXgnL8SHjwZ6B7z4/getUpdates`
+// `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`
 // 對上面的網址輸入後， {"ok":true,"result":[]} ，此時對tg bot輸入hello world ，會回傳如下格式數據
 // {
 //   "ok": true,
