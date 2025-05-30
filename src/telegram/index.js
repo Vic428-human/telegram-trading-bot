@@ -11,7 +11,7 @@ const bot = new TelegramBot(token, {polling: true});
 const initBOt = async() => {
     console.log('init TG bot...')
 
-    bot.onText(/\/start/, (msg, match) => {
+    bot.onText(/\/start/, (msg) => {
         commandHandler.startCommand(bot, msg);
     });
 
@@ -29,7 +29,7 @@ module.exports = { initBOt };
 
 
 // bot.onText 基本用法：  https://github.com/mullwar/telebot#sendmessagechat_id-text-parsemode-replytomessage-replymarkup-notification-webpreview
-// // 匹配 "/echo [任何內容]"
+// 匹配 "/echo [任何內容]"
 // bot.onText(/\/echo (.+)/, (msg, match) => {
 //     // 'msg' 是從 Telegram 接收到的訊息
 //     // 'match' 是上述正規表達式在訊息文字內容上執行的結果
