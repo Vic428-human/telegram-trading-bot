@@ -1,7 +1,7 @@
 # 🌌 Codebase
 
 > 主要基於 ES6 (ES2015) 和 ES2017 語法規範，但採用 Node.js 的 CommonJS 模組載入方式，屬於典型的後端 JavaScript 開發寫法。若要明確指定版本，可視為 ES2017+ 的實踐。
-> 箭頭函數與 async/await 語法、const 與解構賦值、模板字符串(process.env.ETH_RPC_URL || "")，未使用 ES2020+ 新特性如 optional chaining (?.) 或 nullish coalescing (??)，
+> 箭頭函數與 async/await 語法、const 與解構賦值、模板字符串(process.env.ETH_RPC_URL || "")，有小部分使用 ES2020+ 新特性如 optional chaining (?.) 或 nullish coalescing (??)，
 > 且 node 18.20.4 版本下載相關套件，雖然 node 14 以上就能用 ES2020+ 的寫法，但此專案還是以 ES2017+方式撰寫。當然日後用 ES2020+ 新特性去實作也不影響就是了。
 
 - src/polling => 指應用程式定期向區塊鏈節點或 API 發送請求，以獲取最新的鏈上資料或狀態更新。例如，開發者會透過 polling 方式，定時查詢某個錢包地址的餘額、交易狀態、NFT 持有情況等資訊

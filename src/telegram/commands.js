@@ -12,9 +12,9 @@ const startCommand = async(bot, msg) => {
 async function addWalletCommand(bot, msg, match) {
     const chatId = msg.chat.id;
     // 拆解指令參數
-    const params = match[1].trim().split(/\s+/); // 用空白分隔
+    const params = match[1].trim().split("");
     const address = params[0];
-    const chainID = params[1]?.toLowerCase();
+    const chainID = params[1]?.toLowerCase(); // ?.es2020+寫法
 
     const message = `已成功將地址 ${address} 加入 ${chainID} 鏈的追蹤清單`;
     // 假設DB還沒追蹤，那我要加進去追蹤清單
