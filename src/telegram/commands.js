@@ -1,9 +1,33 @@
+const BotConfig = require("../db/models/botConfig");
+
+const storeChatID = async (chatID) => {
+    // 判斷DB 是否存在
+    const chatIDConfig = new BotConfig.findOne({setting:"chatId"})
+
+    // 如不存在就在DB添上一筆
+    if(!chatIDConfig){
+       chatIDConfig = new BotConfig({
+        setting:"chatId",
+        value: chatID.toSring(),
+        description:`用於接收機器人通知的主要聊天室 ID：${chatID}`
+       })
+    }else{
+        // 如存在，就透過當前指令更新
+        chatIDConfig.value = chatID.toString();
+        console.log(`更新主要聊天室 ID:${chatID}`);
+    }
+    chatIDConfig.save();
+}
+
+
 const startCommand = async(bot, msg) => {
     // 'msg' 是從 Telegram 接收到的訊息
     // 'match' 是上述正規表達式在訊息文字內容上執行的結果
     const chatId = msg.chat.id; // msg 裡的數據由來？ E-1 ，用意為對特定 ChatId 發送訊息
     const url = "https://google.com";
     const message = `歡迎使用TG機器人，專案位置${url}`;
+
+    await storeChatID(chatId);
     let parse_mode = 'Markdown';
      // 機器人將訊息傳給使用者 
     await bot.sendMessage(chatId, message, { parse_mode }); // bot.on 的話是搭配 parseMode 而 onText 則是搭配 => https://stackoverflow.com/questions/55761720/how-to-use-markdown-in-parse-mode-of-telegram-bot

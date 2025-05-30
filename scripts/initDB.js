@@ -64,8 +64,8 @@ const initBotConfig = async() => {
     const requireConfig = [
       {setting: "botStatus",value: "running", description:"機器人狀態"},
       {setting: "notifyOnfailed",value: true, description:"通知Swap失敗"},
-      // 當環境變數有另外設定時，假設我希望通知發給特定使用者(chat ID)，就會需要彈性配置
-      ...(process.env.ADMIN_CHAT_ID ? [{setting: "chatId",value: process.env.ADMIN_CHAT_ID, description:"管理員Chat ID"}] : []),
+      // 當環境變數有另外設定時，假設我希望通知發給特定使用者(chatID)，就會需要彈性配置
+      ...(process.env.ADMIN_CHAT_ID ? [{setting: "chatId",value: process.env.ADMIN_CHAT_ID,   description:`用於接收機器人通知的主要聊天室ID`}] : []),
     ]
 
     // 把實際上必要的欄位都存在DB
