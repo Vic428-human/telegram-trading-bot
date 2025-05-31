@@ -1,22 +1,31 @@
 const BotConfig = require("../db/models/botConfig");
+const Chain = require("../db/models/chains");
 
 const storeChatID = async (chatID) => {
-    // 判斷DB 是否存在
-    const chatIDConfig = new BotConfig.findOne({setting:"chatId"})
 
-    // 如不存在就在DB添上一筆
-    if(!chatIDConfig){
-       chatIDConfig = new BotConfig({
-        setting:"chatId",
-        value: chatID.toSring(),
-        description:`用於接收機器人通知的主要聊天室 ID：${chatID}`
-       })
-    }else{
-        // 如存在，就透過當前指令更新
-        chatIDConfig.value = chatID.toString();
-        console.log(`更新主要聊天室 ID:${chatID}`);
+    try{
+        // 判斷DB 是否存在
+        const chatIDConfig = new BotConfig.findOne({setting:"chatId"})
+
+        // 如不存在就在DB添上一筆
+        if(!chatIDConfig){
+        chatIDConfig = new BotConfig({
+            setting:"chatId",
+            value: chatID.toSring(),
+            description:`用於接收機器人通知的主要聊天室 ID：${chatID}`
+        })
+        }else{
+            // 如存在，就透過當前指令更新
+            chatIDConfig.value = chatID.toString();
+            console.log(`更新主要聊天室 ID:${chatID}`);
+        }
+        await chatIDConfig.save();
+        return true; 
+    }catch(err){
+        console.error('更新主要聊天室 ID 失敗',err);
+        return false;
     }
-    chatIDConfig.save();
+  
 }
 
 
@@ -35,10 +44,26 @@ const startCommand = async(bot, msg) => {
 
 async function addWalletCommand(bot, msg, match) {
     const chatId = msg.chat.id;
+    // await storeChatID(chatId);
+
     // 拆解指令參數
     const params = match[1].trim().split("");
+
+    // 先判斷指令是否正確
+    if (params.length < 2) {
+        const message = `請提供有效的地址和鏈名 /add <address> <chainID>`;
+        await bot.sendMessage(chatId, message);
+        return;
+    }
+
     const address = params[0];
     const chainID = params[1]?.toLowerCase(); // ?.es2020+寫法
+
+    // 指令正確後，判斷鏈是否存在於DB
+    if(!chainID){
+        await bot.sendMessage(chatId, `你輸入的這條鏈，上不存在於資料庫中`); // TODO:之後多做一個 /list 指令
+        return;
+    }
 
     const message = `已成功將地址 ${address} 加入 ${chainID} 鏈的追蹤清單`;
     // 假設DB還沒追蹤，那我要加進去追蹤清單
