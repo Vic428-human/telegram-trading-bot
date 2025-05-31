@@ -39,59 +39,58 @@ const startCommand = async(bot, msg) => {
     await storeChatID(chatId);
     let parse_mode = 'Markdown';
      // 機器人將訊息傳給使用者 
-    await bot.sendMessage(chatId, message, { parse_mode }); // bot.on 的話是搭配 parseMode 而 onText 則是搭配 => https://stackoverflow.com/questions/55761720/how-to-use-markdown-in-parse-mode-of-telegram-bot
+    bot.sendMessage(chatId, message, { parse_mode }); // bot.on 的話是搭配 parseMode 而 onText 則是搭配 => https://stackoverflow.com/questions/55761720/how-to-use-markdown-in-parse-mode-of-telegram-bot
  }
 
 async function addWalletCommand(bot, msg, match) {
     const chatId = msg.chat.id;
     // await storeChatID(chatId);
+    try {
+        const params = match[1].trim().split("");
 
-    // 拆解指令參數
-    const params = match[1].trim().split("");
-
-    // 先判斷指令是否正確
-    if (params.length < 2) {
-        const message = `請提供有效的地址和鏈名 /add <address> <chainID>`;
-        await bot.sendMessage(chatId, message);
-        return;
-    }
-
-    const address = params[0];
-    const chainID = params[1]?.toLowerCase(); // ?.es2020+寫法
-
-    // 指令正確後，判斷鏈是否存在於DB
-    if(!chainID){
-        await bot.sendMessage(chatId, `你輸入的這條鏈，上不存在於資料庫中`); // TODO:之後多做一個 /list 指令
-        return;
-    }
-    // 確認錢包地址是否已經追蹤，若沒有則添加
-
-    // 已經追蹤的錢包是否已經存在
-    const isExistWallet = await TrackedWallet.findOne({address:address, chain:chainID})
-    
-    // 存在
-    if(isExistWallet){
-        // 如果存在，就要判斷當前是激活還是沒激活
-        if(isExistWallet.isActive){
-            await bot.sendMessage(chatId, `這個錢包地址已經追蹤`);
-            return;
-        }else{
-            isExistWallet.isActive = true;
-            await isExistWallet.save();
-            await bot.sendMessage(chatId, `剛才還沒激活，現在已經激活囉`);
+        // 先判斷指令是否正確
+        if (params.length < 2) {
+            bot.sendMessage(chatId, `請提供有效的地址和鏈名 /add <address> <chainID>`);
             return;
         }
-    }
 
-    // 不存在
-    const newWallet = new TrackedWallet({address:address, chain:chainID,isActive:true})
-    await newWallet.save();
+        const address = params[0];
+        const chainID = params[1]?.toLowerCase(); // ?.es2020+寫法
+
+        // 指令正確後，判斷鏈是否存在於DB
+        if(!chainID){
+            await bot.sendMessage(chatId, `你輸入的這條鏈，上不存在於資料庫中`); // TODO:之後多做一個 /list 指令
+            return;
+        }
+
+        // 若鏈存在，需要追蹤錢包，先確認DB是否已經追蹤
+        const isExistWallet = await TrackedWallet.findOne({address:address, chain:chainID})
+        
+        // 存在
+        if(isExistWallet){
+            // 如果存在，就要判斷當前是激活還是沒激活
+            if(isExistWallet.isActive){
+                bot.sendMessage(chatId, `這個錢包地址已經追蹤`);
+                return;
+            }else{
+                isExistWallet.isActive = true;
+                await isExistWallet.save();
+                bot.sendMessage(chatId, `剛才還沒激活，現在已經激活囉`);
+                return;
+            }
+        }
+
+        // 不存在
+        const newWallet = new TrackedWallet({address:address, chain:chainID, isActive:true})
+        await newWallet.save();
     
-
-    // 先判斷沒有的情況
-    const message = `已成功將地址 ${address} 加入 ${chainID} 鏈的追蹤清單`;
-    // 假設DB還沒追蹤，那我要加進去追蹤清單
-    await bot.sendMessage(chatId, message);
+        // 追蹤成功，回傳訊息
+        bot.sendMessage(chatId, `${address} 鏈 ${chainID} 錢包已經追蹤成功，現在可以開始監控了`); 
+    } catch (error) {
+        console.error(error);
+        bot.sendMessage(chatId, `追蹤指令發生錯誤：${error.message}`);
+    }
+    
 }
 
 
